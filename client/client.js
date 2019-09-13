@@ -1,8 +1,9 @@
 const Twitch = require('./twitch');
 const Config = require('./config');
 const Conn = require('./conn');
+const Util = require('./util');
 
-const URL = 'http://localhost:9123';
+const URL = 'http://twitchmodpacksync.tk';
 
 async function main() {
     const config = new Config();
@@ -11,9 +12,26 @@ async function main() {
 
     const conn = new Conn(URL);
 
-    console.log(await conn.list());
+    const serverList = await conn.list();
 
-    console.log(twitch.listInstances());
+    const clientList = twitch.listInstances();
+
+    const availableUpdates = Object.keys(serverList).filter(pack => clientList[pack].version !== serverList[pack].version);
+
+    if (availableUpdates.length === 0) {
+        console.log('No updates available');
+        process.exit();
+    }
+
+    console.log('Available updates: ' + availableUpdates.join(', '));
+
+    for (let i = 0; i < availableUpdates.length; i++) {
+        const pack = availableUpdates[i];
+        const update = await Util.readLine(`Update ${pack} (${clientList[pack].version} -> ${serverList[pack].version})? (y/n): `);
+        if (update.toLowerCase() === 'y') {
+            await twitch.updateInstance(pack, serverList[pack].version, conn);
+        }
+    }
 }
 
 main().catch(console.error);
