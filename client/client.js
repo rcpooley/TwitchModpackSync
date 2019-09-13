@@ -16,7 +16,8 @@ async function main() {
 
     const clientList = twitch.listInstances();
 
-    const availableUpdates = Object.keys(serverList).filter(pack => clientList[pack].version !== serverList[pack].version);
+    const availableUpdates = Object.keys(serverList)
+        .filter(pack => pack in clientList && clientList[pack].version !== serverList[pack].version);
 
     if (availableUpdates.length === 0) {
         console.log('No updates available');
