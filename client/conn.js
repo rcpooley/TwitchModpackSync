@@ -34,7 +34,12 @@ class Conn {
         return new Promise((resolve, reject) => {
             request(this.url + endpoint, (err, resp, body) => {
                 if (err) return reject(err);
-                resolve(JSON.parse(body));
+                try {
+                    resolve(JSON.parse(body));
+                } catch (e) {
+                    console.error('Invalid server response:', e);
+                    process.exit();
+                }
             });
         });
     }

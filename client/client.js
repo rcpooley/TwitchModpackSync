@@ -20,18 +20,19 @@ async function main() {
 
     if (availableUpdates.length === 0) {
         console.log('No updates available');
-        process.exit();
-    }
+    } else {
+        console.log('Available updates: ' + availableUpdates.join(', '));
 
-    console.log('Available updates: ' + availableUpdates.join(', '));
-
-    for (let i = 0; i < availableUpdates.length; i++) {
-        const pack = availableUpdates[i];
-        const update = await Util.readLine(`Update ${pack} (${clientList[pack].version} -> ${serverList[pack].version})? (y/n): `);
-        if (update.toLowerCase() === 'y') {
-            await twitch.updateInstance(pack, serverList[pack].version, conn);
+        for (let i = 0; i < availableUpdates.length; i++) {
+            const pack = availableUpdates[i];
+            const update = await Util.readLine(`Update ${pack} (${clientList[pack].version} -> ${serverList[pack].version})? (y/n): `);
+            if (update.toLowerCase() === 'y') {
+                await twitch.updateInstance(pack, serverList[pack].version, conn);
+            }
         }
     }
+
+    await Util.readLine('Hit enter to exit');
 }
 
 main().catch(console.error);
